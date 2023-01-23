@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { connectionString } = require('../config')
 const President = require('../models/President')
+const { richardNixonId } = require('../exercises/exercise4')
 
 /*
 Find president Richard Nixon using his document id.
@@ -18,7 +19,7 @@ const exercise = async () => {
     // --------------------------------
     // ------ Add solution below ------
     // --------------------------------
-    const response = await President.findById('63cd02fcf37f9868d6654aef') // NOTE: Your id will be different...
+    const response = await President.findById(richardNixonId) // NOTE: Your id will be different...
 
     console.log(response)
   } catch (error) {

@@ -2,9 +2,12 @@ const mongoose = require('mongoose')
 const { connectionString } = require('../config')
 
 /*
-Find president Richard Nixon using his document id.
-Log the response to ther Terminal.
+  1) Set the richardNixonId variable to Richard Nixons document id
+  2) Find president Richard Nixon using his document id.
+  3) Log the response to ther Terminal.
 */
+
+const richardNixonId = '<Insert ID Here>'
 
 const exercise = async () => {
   let conn
@@ -31,3 +34,5 @@ const exercise = async () => {
 }
 
 exercise()
+
+module.exports = { richardNixonId }

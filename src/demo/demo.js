@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Pet = require('../models/Pet')
+const { demoConnectionString } = require('../config')
 
 const petsData = [
   { name: 'Mikey', age: 4, species: 'Gerbil', mammal: true },
@@ -17,24 +18,27 @@ const demoQueries = async () => {
   let conn
   try {
     // Connect to database
-    mongoose.set('strictQuery', false) // https://stackoverflow.com/questions/74747476/deprecationwarning-mongoose-the-strictquery-option-will-be-switched-back-to
-    conn = await mongoose.connect('mongodb://admin:password123@localhost:27017/demo?authSource=admin')
+    conn = await mongoose.connect(demoConnectionString)
     console.log(`MongoDB connected: ${conn.connection.host}`)
 
-    const response = "Let's get started!"
-
     /* -------- CREATE: Adding document(s) to database -------- */
-    // Add new document using constructor + .save()
-    /* const newPet = new Pet({
-      name: 'Rainbow Dash',
-      age: 9,
-      species: 'Pony',
-      mammal: true,
-    })
-    const response = await newPet.save() */
 
     // Add new single document using .create()
-    // const response = await Pet.create({ name: 'Chilli', age: 22, species: 'Hot Dog', mammal: false })
+    /* const response = await Pet.create({
+      name: 'Rainbow Dash',
+      age: 4,
+      species: 'Pony',
+      mammal: true,
+    }) */
+
+    // Add new document using constructor + .save()
+    /* const newPet = new Pet({
+      name: 'Tarantino',
+      age: 1,
+      species: 'Tarantula',
+      mammal: false,
+    })
+    const response = await newPet.save()*/
 
     // Add multiple documents using .create()
     // const response = await Pet.create(petsData)
@@ -44,36 +48,37 @@ const demoQueries = async () => {
     // const response = await Pet.find()
 
     // Get one document by id
-    // const response = await Pet.findById('63cd4214c0810e2349fe3222')
+    // const response = await Pet.findById('63cfa0d84c4f1a69d6db2a1d')
+    /* const response = await Pet.find({
+      _id: '63cfa0d84c4f1a69d6db2a1d',
+    }) */
 
     // Find documents by key + value
-    // const response = await Pet.find({ species: 'Cat' })
-    // const response = await Pet.find({ mammal: false, age: 43 })
+    /* const response = await Pet.find({
+      species: 'Cat',
+      age: 3,
+    }) */
 
     // Find first document that matches
-    // const response = await Pet.findOne({ species: 'Cat' })
-    // const response = await Pet.findOne({ mammal: false })
+    /* const response = await Pet.findOne({
+      species: 'Cat',
+    }) */
 
     // Find using Regex
-    // const response = await Pet.find({ species: /(d|D)og$/ })
+    /* const response = await Pet.find({
+      species: /(D|d)og$/,
+    }) */
 
     /* -------- READ 1.2: .find() with operators -------- */
-
-    // Link to list of operators: https://www.mongodb.com/docs/manual/reference/operator/query/
-
-    // Greater than || Greater than or equal to
-    /* const response = await Pet.find({
-      age: {
-        // $gt: 4,
-        $gte: 3,
-      },
-    }) */
+    /* Link to list of operators: https://www.mongodb.com/docs/manual/reference/operator/query/ */
 
     // Lower than || Lower than or equal to
     /* const response = await Pet.find({
       age: {
-        // $lt: 3,
-        $lte: 3,
+        // $lt: 12,
+        // $lte: 3,
+        // $gt: 5,
+        $gte: 5
       },
     }) */
 
@@ -82,19 +87,20 @@ const demoQueries = async () => {
       species: {
         $ne: 'Cat',
       },
+      age: 43,
     }) */
 
     // Value is not in array
     /* const response = await Pet.find({
       species: {
-        $nin: ['Cat', 'Mole rat', 'Parrot'],
+        $nin: ['Cat', 'Parrot', 'Pony'],
       },
     }) */
 
     // Value is in array
     /* const response = await Pet.find({
       species: {
-        $in: ['Cat', 'Mole rat', 'Parrot'],
+        $in: ['Cat', 'Parrot', 'Pony'],
       },
     }) */
 
@@ -102,18 +108,17 @@ const demoQueries = async () => {
     // prettier-ignore
     /* const response = await Pet.find({
       $and: [
-        { species: { $ne: 'Cat' } }, 
-        { mammal: false }, 
-        { age: { $lte: 5 } }
-      ],
+        { species: 'Cat' },
+        { age: 3 }
+      ]
     }) */
 
     // Passing multiple queries using OR
     /* const response = await Pet.find({
       $or: [
-        { mammal: false }, 
-        { species: 'Cat' }
-      ],
+        { species: 'Cat' },
+        { age: 43 }
+      ]
     }) */
 
     /* -------- READ 1.3: Filter fields -------- */
@@ -121,69 +126,84 @@ const demoQueries = async () => {
     // Projection
     /* const response = await Pet.find({}, {
       name: true,
-      age: true
+      species: true,
+      _id: false
     }) */
-    /* const response = await Pet.find({}, {
-      createdAt: false,
+    /* const response = await Pet.find({
+      species: 'Cat'
+    }, {
+      _id: false,
+      __v: false,
       updatedAt: false,
-      _id:  false,
-      __v: false
+      createdAt: false
     }) */
 
     // .select()
-    // const response = await Pet.find({}).select('name age')
-    // const response = await Pet.find({}).select('name age -_id')
-
-    /* const response = await Pet.find({}).select({
+    /* const response = await Pet.find().select({
       name: true,
       age: true
     }) */
-    /* const response = await Pet.find({}).select({
-      createdAt: false,
-      updatedAt: false,
-      _id:  false,
-      __v: false
-    }) */
+    // const response = await Pet.find().select('name species')
 
-    /* -------- READ 1.3: Count documents -------- */
+    /* -------- READ 1.3: Count, limit, skip, sort documents -------- */
     // .count()
-    // const response = await Pet.find({ species: 'Cat'}).count()
+    /* const response = await Pet.find({
+      species: 'Cat'
+    }).count() */
 
     // .limit()
     // const response = await Pet.find().limit(3)
 
     // .skip()
-    // const response = await Pet.find().skip(5)
-    // const response = await Pet.find().skip(5).limit(2)
+    // const response = await Pet.find().skip(2)
+    // const response = await Pet.find().skip(5).limit(5)
 
     // .sort()
-    // const response = await Pet.find().sort({ name: 1 })
-    // const response = await Pet.find().sort({ age: -1 })
+    /* const response = await Pet.find().sort({
+      // age: -1
+      name: 1
+    }) */
     // const response = await Pet.find({ age: { $lte: 3 } }).sort({ age: -1, name: 1 })
 
     /* -------- UPDATE: Updatings document(s) in the database -------- */
 
-    /* const updatePet = await Pet.findOne({ name: 'Rainbow Dash' })
-    updatePet.age = 112
-    updatePet.species = 'Horse'
-    const response = await updatePet.save() */
+    // .findOne()
+    /* const petToUpdate = await Pet.findOne({ species: 'Pony' })
+    petToUpdate.species = 'Highland Pony'
+    petToUpdate.age = 42
+    const response = await petToUpdate.save() */
 
-    /* const response = await Pet.findByIdAndUpdate('63cd417c70326b13757e4c10', {
-      age: 57,
-      species: 'Big horse'
+    // .findByIdAndUpdate()
+    /* const response = await Pet.findByIdAndUpdate('63cf9ee73dc508f29442e588', {
+      age: 47,
+      species: 'My Little Pony',
+      mammal: false
     }) */
 
-    /* const response = await Pet.findOneAndUpdate({ name: 'Rainbow Dash' }, {
-      age: 41,
-      species: 'Tiny big horse pony'
+    // .findOneAndUpdate()
+    /* const response = await Pet.findOneAndUpdate({
+      age: 47
+    }, {
+      species: 'Too old to be real'
     }) */
 
     /* -------- DELETE: Removing document(s) from database -------- */
-    // const response = await Pet.findByIdAndDelete('63cd41c6453980764a16f1cd')
-    // const response = await Pet.findOneAndDelete({ species: 'Cat' })
-    // const response = await Pet.deleteMany({ species: /(D|d)og$/ })
+
+    // .findByIdAndDelete()
+    // const response = await Pet.findByIdAndDelete('63cf9ee73dc508f29442e588')
+
+    // .findOneAndDelete()
+    /* const response = await Pet.findOneAndDelete({
+      species: 'Tarantula'
+    }) */
+
+    // .deleteMany()
+    /* const response = await Pet.deleteMany({
+      species: 'Cat'
+    }) */
     // const response = await Pet.deleteMany()
 
+    const response = 'Done!'
     console.log(response)
   } catch (error) {
     // Log eny eventual errors to Terminal
